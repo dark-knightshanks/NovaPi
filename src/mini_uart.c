@@ -1,8 +1,9 @@
 #include "utils.h"
 #include "peripherals/mini_uart.h"
 #include "peripherals/gpio.h"
+//#include "mini_uart.h"
 
-void uart_send ( char c )
+void muart_send ( char c )
 {
 	while(1) {
 		if((*AUX_MU_LSR_REG)&0x20) 
@@ -11,7 +12,7 @@ void uart_send ( char c )
 	*AUX_MU_IO_REG=c;
 }
 
-char uart_recv ( void )
+char muart_recv ( void )
 {
 	while(1) {
 		if((*AUX_MU_LSR_REG)&0x01) 
@@ -20,13 +21,13 @@ char uart_recv ( void )
 	return((*AUX_MU_IO_REG)&0xFF);
 }
 
-void uart_send_string(char* str)
+void muart_send_string(char* str)
 {
 	for (int i = 0; str[i] != '\0'; i ++) {
-		uart_send((char)str[i]);
+		muart_send((char)str[i]);
 	}
 }
-void uart_init ( void )
+void muart_init ( void )
 {
     unsigned int selector;
 
@@ -39,9 +40,17 @@ void uart_init ( void )
 
 
     // Clear pull-up/down settings for GPIO 14 and 15 (each pin uses 2 bits)
-unsigned int reg = *GPIO_PUP_PDN_CNTRL_REG0;
-reg &= ~((0b11 << (14 * 2)) | (0b11 << (15 * 2)));  // Clear bits for GPIO14 and GPIO15
-*GPIO_PUP_PDN_CNTRL_REG0 = reg;
+//unsigned int reg = *GPIO_PUP_PDN_CNTRL_REG0;
+//reg &= ~((0b11 << (14 * 2)) | (0b11 << (15 * 2)));  // Clear bits for GPIO14 and GPIO15
+//*GPIO_PUP_PDN_CNTRL_REG0 = reg;
+// Rasp pi3b
+*GPPUD = 0;  // Disable pull-up/down
+delay(150);
+
+*GPPUDCLK0 = (1 << 14) | (1 << 15);  // Clock the control signal into GPIO 14 and 15
+delay(150);
+
+*GPPUDCLK0 = 0;  // Remove the clock
 
     *AUX_ENABLES=1;                   //Enable mini uart (this also enables access to its registers)
     *AUX_MU_CNTL_REG=0;               //Disable auto flow control and disable receiver and transmitter (for now)
@@ -51,4 +60,8 @@ reg &= ~((0b11 << (14 * 2)) | (0b11 << (15 * 2)));  // Clear bits for GPIO14 and
     *AUX_MU_BAUD_REG=270;             //Set baud rate to 115200
 
     *AUX_MU_CNTL_REG=3;               //Finally, enable transmitter and receiver
+}
+void putc ( void* p, char c)
+{
+	muart_send(c);
 }
