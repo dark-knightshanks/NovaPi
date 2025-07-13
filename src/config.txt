@@ -1,2 +1,4 @@
 kernel=kernel8.img
-dt-overlay=disable-bt
+dtoverlay=disable-bt
+enable_uart=1
+arm_64bit=1

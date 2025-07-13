@@ -1,14 +1,38 @@
+ENTRY(_start)
+
 SECTIONS
 {
-    . = 0x80000; /* Load kernel at 0x80000 (Raspberry Pi standard) */
+    . = 0x80000; /* Raspberry Pi 4B firmware loads kernel8.img here */
 
-    .text.boot : { *(.text.boot) }
-    .text : { *(.text) }
-    .rodata : { *(.rodata) }
-    .data : { *(.data) }
+    /* Code section */
+    .text : ALIGN(4)
+    {
+        KEEP(*(.text.boot)) /* startup code */
+        *(.text*)
+    }
 
-    . = ALIGN(0x8);
-    bss_begin = .;
-    .bss : { *(.bss*) }
-    bss_end = .;
+    /* Read-only data */
+    .rodata : ALIGN(4)
+    {
+        *(.rodata*)
+    }
+
+    /* Initialized data */
+    .data : ALIGN(4)
+    {
+        *(.data*)
+    }
+
+    /* Uninitialized data (zero-initialized by startup code) */
+    .bss : ALIGN(8)
+    {
+    __bss_start = .;
+    bss_begin = .;     /* <-- needed by boot.S */
+    *(.bss*)
+    *(COMMON)
+    bss_end = .;       /* <-- needed by boot.S */
+    __bss_end = .;
+    }
+
 }
+

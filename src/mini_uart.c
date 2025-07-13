@@ -40,17 +40,17 @@ void muart_init ( void )
 
 
     // Clear pull-up/down settings for GPIO 14 and 15 (each pin uses 2 bits)
-//unsigned int reg = *GPIO_PUP_PDN_CNTRL_REG0;
-//reg &= ~((0b11 << (14 * 2)) | (0b11 << (15 * 2)));  // Clear bits for GPIO14 and GPIO15
-//*GPIO_PUP_PDN_CNTRL_REG0 = reg;
+unsigned int reg = *GPIO_PUP_PDN_CNTRL_REG0;
+reg &= ~((0b11 << (14 * 2)) | (0b11 << (15 * 2)));  // Clear bits for GPIO14 and GPIO15
+*GPIO_PUP_PDN_CNTRL_REG0 = reg;
 // Rasp pi3b
-*GPPUD = 0;  // Disable pull-up/down
-delay(150);
+//*GPPUD = 0;  // Disable pull-up/down
+//delay(150);
 
-*GPPUDCLK0 = (1 << 14) | (1 << 15);  // Clock the control signal into GPIO 14 and 15
-delay(150);
+//*GPPUDCLK0 = (1 << 14) | (1 << 15);  // Clock the control signal into GPIO 14 and 15
+//delay(150);
 
-*GPPUDCLK0 = 0;  // Remove the clock
+//*GPPUDCLK0 = 0;  // Remove the clock
 
     *AUX_ENABLES=1;                   //Enable mini uart (this also enables access to its registers)
     *AUX_MU_CNTL_REG=0;               //Disable auto flow control and disable receiver and transmitter (for now)
