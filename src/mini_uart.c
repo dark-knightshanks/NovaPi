@@ -1,7 +1,6 @@
 #include "utils.h"
 #include "peripherals/mini_uart.h"
 #include "peripherals/gpio.h"
-//#include "mini_uart.h"
 
 void muart_send ( char c )
 {
@@ -29,28 +28,7 @@ void muart_send_string(char* str)
 }
 void muart_init ( void )
 {
-    unsigned int selector;
-
-    selector = *GPFSEL1;
-    selector &= ~(7<<12);                   // clean gpio14
-    selector |= 2<<12;                      // set alt5 for gpio14
-    selector &= ~(7<<15);                   // clean gpio15
-    selector |= 2<<15;                      // set alt5 for gpio 15
-    *GPFSEL1 = selector;
-
-
-    // Clear pull-up/down settings for GPIO 14 and 15 (each pin uses 2 bits)
-unsigned int reg = *GPIO_PUP_PDN_CNTRL_REG0;
-reg &= ~((0b11 << (14 * 2)) | (0b11 << (15 * 2)));  // Clear bits for GPIO14 and GPIO15
-*GPIO_PUP_PDN_CNTRL_REG0 = reg;
-// Rasp pi3b
-//*GPPUD = 0;  // Disable pull-up/down
-//delay(150);
-
-//*GPPUDCLK0 = (1 << 14) | (1 << 15);  // Clock the control signal into GPIO 14 and 15
-//delay(150);
-
-//*GPPUDCLK0 = 0;  // Remove the clock
+    miniuart_gpio();
 
     *AUX_ENABLES=1;                   //Enable mini uart (this also enables access to its registers)
     *AUX_MU_CNTL_REG=0;               //Disable auto flow control and disable receiver and transmitter (for now)
