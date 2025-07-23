@@ -11,4 +11,8 @@
 #define GPIO_PUP_PDN_CNTRL_REG0     ((volatile unsigned int*)(PBASE + 0x002000E4))
 #define GPIO_PUP_PDN_CNTRL_REG2     ((volatile unsigned int*)(PBASE + 0x002000EC))
 
+// OLED control pins
+#define DC_PIN  24
+#define RST_PIN 25
+
 #endif  /*_P_GPIO_H */

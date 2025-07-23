@@ -3,7 +3,7 @@
 #include "mini_uart.h"
 #include "timer.h"
 #include "irq.h"
-#include "oled.h"
+#include "spi.h"
 
 void kernel_main(void)
 {
@@ -13,7 +13,8 @@ void kernel_main(void)
     uart_send_string("Hello, world!\r\n");
     int el = get_el();
     printf("Exception level: %d\r\n", el);  // Should now work
-    
+    spi_init();
+    display_logo();
     //irq_vector_init();
 	//timer_init();
 	//enable_interrupt_controller();
