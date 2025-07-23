@@ -1,6 +1,6 @@
 #include "peripherals/gpio.h"
 #include "utils.h"
-
+#include "printf.h"
 
 void miniuart_gpio(){
 
@@ -65,5 +65,17 @@ void spi_gpio(){
         reg &= ~((0b11 << 20) | (0b11 << 22)); // clear bits
         *GPIO_PUP_PDN_CNTRL_REG0 = reg;
 
+        // Configure GPIO24 as output
+        unsigned int selector2 = *GPFSEL2;  // GPIO24 is in GPFSEL2
+        selector2 &= ~(7 << 12);            // Clear bits 14:12 (GPIO24)
+        selector2 |= (1 << 12);             // Set to output (001)
+        *GPFSEL2 = selector2;
+}
 
+void oled_gpiocmd(){
+    *GPCLR0 = (1 << 24);
+}
+
+void oled_gpiodata(){
+    *GPSET0 = (1 << 24); 
 }
