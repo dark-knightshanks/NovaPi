@@ -20,7 +20,7 @@ void miniuart_gpio(){
 
     }
 
-    void pl011_gpio(){
+void pl011_gpio(){
 
         // 1. Configure GPIO14 and GPIO15 to ALT0 (UART)
         unsigned int selector = *GPFSEL1;
@@ -38,3 +38,32 @@ void miniuart_gpio(){
         delay(150);  // wait for change to latch
     
     }
+
+void spi_gpio(){
+
+        // clear bits for GPIO8
+        unsigned int selector0 = *GPFSEL0;
+        selector0 &= ~(7 << 24);
+        selector0 |=  (4 << 24);// set alt0
+        *GPFSEL0 = selector0;
+    
+        // disable pull-up/pull-down
+        unsigned int reg0 = *GPIO_PUP_PDN_CNTRL_REG0;
+        reg0 &= ~(0b11 << 16);
+        *GPIO_PUP_PDN_CNTRL_REG0 = reg0;
+
+
+        // clear bits for gpio10 and gpio11
+        unsigned int selector = *GPFSEL1;
+        selector &= ~((7) | (7 << 3));
+        selector |= (4) | (4 << 3); // set alt0 
+        *GPFSEL1 = selector;
+
+
+        // 2. Disable pull-up/down for GPIO10 and GPIO11
+        unsigned int reg = *GPIO_PUP_PDN_CNTRL_REG0;
+        reg &= ~((0b11 << 20) | (0b11 << 22)); // clear bits
+        *GPIO_PUP_PDN_CNTRL_REG0 = reg;
+
+
+}
