@@ -1,4 +1,7 @@
-kernel=kernel8.img
-dtoverlay=disable-bt
+kernel=kernel8-rpi4.img
+dtoverlay=miniuart-bt
 enable_uart=1
 arm_64bit=1
+disable_commandline_tags=1
+
+
