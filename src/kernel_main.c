@@ -7,6 +7,7 @@
 #include "pl011.h"
 
 
+
 void kernel_main(void)
 {
     
@@ -15,8 +16,14 @@ void kernel_main(void)
     muart_send_string("Hello, world!\r\n");
     int el = get_el();
     printf("Exception level: %d\r\n", el);  // Should now work
-    spi_init();
-    display_logo();
+    irq_vector_init();
+	timer_init();
+	enable_interrupt_controller();
+	enable_irq();
+
+	while (1){
+		uart_send(uart_recv());
+	}	
 }
 
 //qemu-system-aarch64 -M raspi3b -kernel kernel8.img -nographic -serial mon:stdio -serial null(pl011 command for QEMU)
