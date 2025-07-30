@@ -11,26 +11,26 @@
 // Fixed SPI functions
 void spi_start_transfer(void) {
     // Clear any previous transfer and start new one
-    *CS |= (1 << 7);   // Set TA (Transfer Active)
+    CS |= (1 << 7);   // Set TA (Transfer Active)
 }
 
 void spi_write_byte(unsigned char data) {
     // Wait for TXD (FIFO can accept data)
-    while (!(*CS & (1 << 18)));
+    while (!(CS & (1 << 18)));
     
     // Write data to FIFO
-    *FIFO = data;
+    FIFO = data;
     
     // Wait for DONE (transfer complete)
-    while (!(*CS & (1 << 16)));
+    while (!(CS & (1 << 16)));
 }
 
 void spi_end_transfer(void) {
     // Wait for all data to be transmitted
-    while (!(*CS & (1 << 17)));  // Wait for RXR (receive FIFO empty)
+    while (!(CS & (1 << 17)));  // Wait for RXR (receive FIFO empty)
     
     // Clear TA to end transfer
-    *CS &= ~(1 << 7);
+    CS &= ~(1 << 7);
 }
 
 void oled_command(unsigned char cmd) {
@@ -256,13 +256,13 @@ void spi_init() {
     spi_gpio();
     
     // Set clock divider (adjust speed as needed)
-    *CLK = 256;  // Start with slower speed, can optimize later
+    CLK = 256;  // Start with slower speed, can optimize later
     
     // Clear any existing transfers
-    *CS &= ~(1 << 7);  // Clear TA
+    CS &= ~(1 << 7);  // Clear TA
     
     // Configure SPI0 Control Register for standard mode
-    *CS = (0 << 7) |     // TA = 0 (not active yet)
+    CS = (0 << 7) |     // TA = 0 (not active yet)
           (0 << 6) |     // REN = 0 (no read enable needed)
           (0 << 5) |     // LEN = 0 (not using LOSSI)
           (0 << 4) |     // CPHA = 0 (clock phase)
@@ -272,7 +272,7 @@ void spi_init() {
           (0 << 0);      // CS = 0 (select chip 0)
     
     // Clear the CLEAR bit after clearing FIFO
-    *CS &= ~(1 << 2);
+    CS &= ~(1 << 2);
     
     printf("spi_init\n");
 }
