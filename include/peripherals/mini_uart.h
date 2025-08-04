@@ -5,8 +5,6 @@
 
 //#define AUX_BASE        (PBASE + 0x00215000)
 
-#include <stdint.h>
-// AUX (Mini UART) Register Definitions - converted to volatile uint32_t*
 #define AUX_ENABLES     REG32(PBASE + 0x00215004)
 #define AUX_MU_IO_REG   REG32(PBASE + 0x00215040)
 #define AUX_MU_IER_REG  REG32(PBASE + 0x00215044)

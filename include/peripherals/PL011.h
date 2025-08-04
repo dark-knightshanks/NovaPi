@@ -3,10 +3,6 @@
 
 #include "peripherals/base.h"
 
-//#define UART_BASE       (PBASE + 0x00201000)
-#include <stdint.h>
-
-
 // Converted to volatile uint32_t*
 #define UART_DR     REG32(PBASE + 0x00201000)
 #define UART_FR     REG32(PBASE + 0x00201018)
@@ -17,10 +13,5 @@
 #define UART_IMSC   REG32(PBASE + 0x00201038)
 #define UART_ICR    REG32(PBASE + 0x00201044)
 
-
-// Usage examples:
-// *UART_DR = 'A';                    // Write character
-// uint32_t status = *UART_FR;        // Read status
-// *UART_CR = (1<<9) | (1<<8) | 1;    // Enable UART
 
 #endif  /*_P_MINI_UART_H */
