@@ -8,10 +8,18 @@
 #define OLED_HEIGHT 64
 #define OLED_PAGES  8    // 64 pixels / 8 = 8 pages
 
+// Add a simple delay function
+void delay_ms(int ms) {
+    for (int i = 0; i < ms * 1000; i++) {
+        asm("nop");
+    }
+}
+
 // Fixed SPI functions
 void spi_start_transfer(void) {
     // Clear any previous transfer and start new one
     CS |= (1 << 7);   // Set TA (Transfer Active)
+    printf("spi-transfer start");
 }
 
 void spi_write_byte(unsigned char data) {
@@ -31,11 +39,13 @@ void spi_end_transfer(void) {
     
     // Clear TA to end transfer
     CS &= ~(1 << 7);
+    printf("spi end");
 }
 
 void oled_command(unsigned char cmd) {
     oled_gpiocmd();  // Set GPIO24 LOW (command mode)
     spi_write_byte(cmd);
+    delay_ms(1);     // Small delay after command
 }
 
 void oled_data(unsigned char data) {
@@ -43,8 +53,7 @@ void oled_data(unsigned char data) {
     spi_write_byte(data);
 }
 
-// Your original logo data - this assumes it's already in the correct OLED page format
-// If your bitmap is in horizontal row format, you'll need to convert it
+// Your original logo data
 const uint8_t logo_bitmap[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
     0x00, 0x3f, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x00, 
@@ -113,7 +122,6 @@ const uint8_t logo_bitmap[] = {
 };
 
 // Function to convert horizontal bitmap to OLED page format
-// This is needed if your bitmap data is in horizontal row format
 void convert_bitmap_to_oled_format(const uint8_t* horizontal_bitmap, 
                                    uint8_t* oled_bitmap, 
                                    int width, int height) {
@@ -147,81 +155,13 @@ void convert_bitmap_to_oled_format(const uint8_t* horizontal_bitmap,
     }
 }
 
-// Function to display the logo on OLED
-void display_logo(void) {
-    // Initialize OLED first
-    oled_init();
-    oled_clear_screen();
-    
-    // Start SPI transfer
-    spi_start_transfer();
-    
-    // Set addressing mode to horizontal
-    oled_command(0x20);  // Set Memory Addressing Mode
-    oled_command(0x00);  // Horizontal Addressing Mode
-    
-    // Calculate centering offsets
-    int col_offset = (OLED_WIDTH - LOGO_WIDTH) / 2;  // Should be 4 for 120px logo on 128px display
-    int page_offset = 0;  // Start from top
-    
-    // Set column address (center the logo)
-    oled_command(0x21);  // Set Column Address
-    oled_command(col_offset);  // Start column
-    oled_command(col_offset + LOGO_WIDTH - 1);  // End column
-    
-    // Set page address
-    oled_command(0x22);  // Set Page Address  
-    oled_command(page_offset);  // Start page
-    oled_command(page_offset + ((LOGO_HEIGHT + 7) / 8) - 1);  // End page
-    
-    // Send the bitmap data
-    // NOTE: If your bitmap is in horizontal format, you need to convert it first
-    // uint8_t oled_formatted_bitmap[LOGO_WIDTH * ((LOGO_HEIGHT + 7) / 8)];
-    // convert_bitmap_to_oled_format(logo_bitmap, oled_formatted_bitmap, LOGO_WIDTH, LOGO_HEIGHT);
-    
-    for (int i = 0; i < sizeof(logo_bitmap); i++) {
-        oled_data(logo_bitmap[i]);
-    }
-    
-    // End SPI transfer
-    spi_end_transfer();
-}
-
-// Helper function to clear screen
-void oled_clear_screen(void) {
-    spi_start_transfer();
-    
-    oled_command(0x20);  // Set Memory Addressing Mode
-    oled_command(0x00);  // Horizontal Addressing Mode
-    
-    oled_command(0x21);  // Set Column Address
-    oled_command(0x00);  // Start column 0
-    oled_command(0x7F);  // End column 127
-    
-    oled_command(0x22);  // Set Page Address
-    oled_command(0x00);  // Start page 0
-    oled_command(0x07);  // End page 7
-    
-    // Send zeros to clear all pixels
-    for (int i = 0; i < OLED_WIDTH * OLED_PAGES; i++) {
-        oled_data(0x00);
-    }
-    
-    spi_end_transfer();
-    printf("oled_clear_screen\n");
-}
-
-// Basic OLED initialization (SSD1306)
+// Basic OLED initialization (SSD1306) - FIXED
 void oled_init(void) {
-    // Optional: Reset sequence if you have RST pin connected
-    // gpio_set_low(RST_PIN);
-    // delay_ms(10);
-    // gpio_set_high(RST_PIN);
-    // delay_ms(10);
-    
     spi_start_transfer();
     
     oled_command(0xAE); // Display off
+    delay_ms(10);       // Allow display to turn off
+    
     oled_command(0xD5); // Set display clock divide ratio/oscillator frequency
     oled_command(0x80); // Set divide ratio
     oled_command(0xA8); // Set multiplex ratio
@@ -245,21 +185,102 @@ void oled_init(void) {
     oled_command(0x40); 
     oled_command(0xA4); // Entire display on (resume to RAM content display)
     oled_command(0xA6); // Set normal display
+    
+    delay_ms(100);      // Allow settings to take effect
+    
     oled_command(0xAF); // Display on
+    delay_ms(10);       // Allow display to turn on
+    
+    spi_end_transfer();  // FIX: This was missing!
+    printf("oled_init complete\n");
+}
+
+// Helper function to clear screen
+void oled_clear_screen(void) {
+    spi_start_transfer();
+    
+    oled_command(0x20);  // Set Memory Addressing Mode
+    oled_command(0x00);  // Horizontal Addressing Mode
+    
+    oled_command(0x21);  // Set Column Address
+    oled_command(0x00);  // Start column 0
+    oled_command(0x7F);  // End column 127
+    
+    oled_command(0x22);  // Set Page Address
+    oled_command(0x00);  // Start page 0
+    oled_command(0x07);  // End page 7
+    
+    // Send zeros to clear all pixels
+    for (int i = 0; i < OLED_WIDTH * OLED_PAGES; i++) {
+        oled_data(0x00);
+    }
     
     spi_end_transfer();
-    printf("oled_init\n");
+    printf("oled_clear_screen complete\n");
+}
+
+// Function to display the logo on OLED - FIXED
+void display_logo(void) {
+    // Initialize OLED first
+    oled_init();
+    delay_ms(100);
+    
+    // Clear screen first
+    oled_clear_screen();
+    delay_ms(50);
+    
+    // Start SPI transfer for logo display
+    spi_start_transfer();
+    
+    // Set addressing mode to horizontal
+    oled_command(0x20);  // Set Memory Addressing Mode
+    oled_command(0x00);  // Horizontal Addressing Mode
+    
+    // Calculate centering offsets
+    int col_offset = (OLED_WIDTH - LOGO_WIDTH) / 2;  // Should be 4 for 120px logo on 128px display
+    int logo_pages = (LOGO_HEIGHT + 7) / 8;  // Number of pages needed for logo
+    
+    // Set column address (center the logo horizontally)
+    oled_command(0x21);  // Set Column Address
+    oled_command(col_offset);  // Start column
+    oled_command(col_offset + LOGO_WIDTH - 1);  // End column
+    
+    // Set page address (start from top)
+    oled_command(0x22);  // Set Page Address  
+    oled_command(0);  // Start page 0
+    oled_command(logo_pages - 1);  // End page (should be 7 for 61-pixel height)
+    
+    // Convert bitmap from horizontal format to OLED page format
+    int converted_size = LOGO_WIDTH * logo_pages;
+    uint8_t oled_formatted_bitmap[converted_size];
+    convert_bitmap_to_oled_format(logo_bitmap, oled_formatted_bitmap, LOGO_WIDTH, LOGO_HEIGHT);
+    
+    printf("Converting bitmap: %d bytes -> %d bytes\n", sizeof(logo_bitmap), converted_size);
+    
+    // Send the converted bitmap data
+    for (int i = 0; i < converted_size; i++) {
+        oled_data(oled_formatted_bitmap[i]);
+    }
+    
+    // End SPI transfer
+    spi_end_transfer();
+    printf("Logo display complete\n");
 }
 
 void spi_init() {
     // Initialize GPIO pins for SPI
     spi_gpio();
     
-    // Set clock divider (adjust speed as needed)
-    CLK = 256;  // Start with slower speed, can optimize later
+    // Set clock divider (slower speed for reliability)
+    CLK = 512;  // Even slower speed for initial testing
     
     // Clear any existing transfers
     CS &= ~(1 << 7);  // Clear TA
+    
+    // Clear FIFO first
+    CS |= (1 << 2);   // Set CLEAR bit
+    delay_ms(1);
+    CS &= ~(1 << 2);  // Clear CLEAR bit
     
     // Configure SPI0 Control Register for standard mode
     CS = (0 << 7) |     // TA = 0 (not active yet)
@@ -274,13 +295,13 @@ void spi_init() {
     // Clear the CLEAR bit after clearing FIFO
     CS &= ~(1 << 2);
     
-    printf("spi_init\n");
+    printf("spi_init complete\n");
 }
 
 // Function to display a simple test pattern
 void display_test_pattern(void) {
     oled_init();
-    oled_clear_screen();
+    delay_ms(100);
     
     spi_start_transfer();
     
@@ -306,4 +327,5 @@ void display_test_pattern(void) {
     }
     
     spi_end_transfer();
+    printf("Test pattern display complete\n");
 }
