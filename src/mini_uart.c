@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "peripherals/mini_uart.h"
+#include "printf.h"
 
 void muart_send ( char c )
 {
@@ -25,6 +26,7 @@ void muart_send_string(char* str)
 		muart_send((char)str[i]);
 	}
 }
+
 void muart_init ( void )
 {
     miniuart_gpio();
