@@ -7,7 +7,9 @@
 #define GPFSEL0                 REG32(PBASE + 0x00200000)
 #define GPFSEL1                 REG32(PBASE + 0x00200004)
 #define GPFSEL2                 REG32(PBASE + 0x00200008)
+#define GPFSEL3                 REG32(PBASE + 0x0020000C)
 #define GPFSEL4                 REG32(PBASE + 0x00200010)
+#define GPFSEL5                 REG32(PBASE + 0x00200014)
 
 #define GPSET0                  REG32(PBASE + 0x0020001C)
 #define GPSET1                  REG32(PBASE + 0x00200020)
@@ -17,6 +19,7 @@
 #define GPIO_PUP_PDN_CNTRL_REG0 REG32(PBASE + 0x002000E4)
 #define GPIO_PUP_PDN_CNTRL_REG1 REG32(PBASE + 0x002000E8)
 #define GPIO_PUP_PDN_CNTRL_REG2 REG32(PBASE + 0x002000EC)
+#define GPIO_PUP_PDN_CNTRL_REG3 REG32(PBASE + 0x002000F0)
 
 
 #define DC_PIN  24

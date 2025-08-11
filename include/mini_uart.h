@@ -7,6 +7,5 @@ void muart_init ( void );
 char muart_recv ( void );
 void muart_send ( char c );
 void muart_send_string(char* str);
-void blink();
-
+void print_uart_registers(void);
 #endif  /*_MINI_UART_H */
