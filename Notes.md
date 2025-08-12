@@ -165,3 +165,200 @@ Assert: ≥3 core clocks before transfer
 
 De-assert: ≥1 clock after last clock pulse
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DMA Controller 
+1. Overview
+The BCM2711 (used in Raspberry Pi 4B) has multiple DMA engines for high-speed data movement without CPU involvement.
+
+Transfers can be:
+
+Memory ↔ Memory
+
+Memory ↔ Peripheral FIFOs
+
+Supports:
+
+AXI bus bursts
+
+Peripheral DREQ pacing
+
+2D stride mode (graphics-friendly)
+
+Chained control blocks
+
+Interrupts on completion or error.
+
+In Circle, DMA is used in many drivers (SPI, USB, networking, etc.), with CPU data cache considerations for performance and correctness.
+
+2. DMA Buffer Requirements (Circle)
+Cache Coherency Issue: DMA bypasses CPU caches → stale or dirty data can cause corruption if buffers aren’t properly flushed/invalidated.
+
+Cache Line Size:
+
+Pi 1 / Zero: 32 B
+
+Pi 2–4: 64 B (important for Pi 4B)
+
+Alignment Rules:
+
+Buffer base address must be aligned to cache line size.
+
+Buffer size must be a multiple of cache line size.
+
+Misalignment can corrupt nearby memory.
+
+When Required:
+
+Any buffer passed to DMA-related Circle methods (e.g., CDMAChannel, CSPIMasterDMA, low-level USB transfers, network device direct frame access, mass storage).
+
+Not required for CSocket networking or SD card driver (no DMA).
+
+Defining a DMA Buffer:
+
+Stack: Use
+
+c
+Copy
+Edit
+DMA_BUFFER(unsigned char, MyBuffer, 100);
+→ expands to __attribute__((aligned(64))) with padding.
+
+Heap: Normal new or malloc() is already cache-aligned.
+
+Static: Use DMA_BUFFER() macro.
+
+3. DMA Controller Registers (per Channel)
+(BCM2711 Peripheral Manual)
+
+CS – Control & Status: Start/Stop, Reset, Interrupt, Error flags.
+
+CONBLK_AD – Physical address of current control block.
+
+TI – Transfer Information:
+
+Peripheral DREQ mapping
+
+Source/Destination increment
+
+Burst length, pacing, 2D stride enable.
+
+SOURCE_AD – Source address.
+
+DEST_AD – Destination address.
+
+TXFR_LEN – Transfer length.
+
+STRIDE – Stride values for 2D transfers.
+
+NEXTCONBK – Pointer to next control block (for chaining).
+
+Debug registers.
+
+4. Control Block Structure
+A 32-byte block in memory describing one DMA transfer:
+
+Transfer Information (TI)
+
+Source Address
+
+Destination Address
+
+Transfer Length
+
+Stride (2D mode)
+
+Next Control Block address
+
+Reserved/padding
+DMA follows the chain for continuous transfers.
+
+5. Peripheral DREQ Signals
+Hardware signals that pace DMA to peripheral readiness.
+
+Examples (BCM2711):
+
+DREQ 6 – SPI0 TX
+
+DREQ 7 – SPI0 RX
+
+DREQ 10 – PWM
+
+DREQ 18 – PCM TX
+
+Prevents FIFO underflow/overflow.
+
+6. AXI Bursts
+DMA can group sequential transfers into bursts → improves throughput.
+
+Burst length programmable in TI.
+
+7. Error Handling
+Errors flagged in CS:
+
+Read error – bad source access.
+
+Write error – bad destination access.
+
+Halts DMA; requires:
+
+Clear error bits
+
+Possibly reset channel before restart.
+
+8. DMA Variants
+Full DMA:
+
+All modes: 2D, bursts, high bandwidth.
+
+DMA Lite:
+
+No 2D mode, smaller transfers, simpler hardware.
+
+DMA4 Engines (BCM2711-specific):
+
+Improved AXI performance
+
+Extended addressing (>4 GB memory)
+
+More channels.
+
+9. Raspberry Pi 4B Specific Differences
+Uses BCM2711 DMA architecture with AXI-based bus, higher throughput.
+
+Cache line size: 64 B (affects alignment requirements in Circle).
+
+More DMA channels available than earlier Pis.
+
+Memory map addresses differ slightly from Pi 3 (due to ARMv8 LPAE changes).
+
+DMA4 engines allow access to RAM above 4 GB if using Pi 4 with >4 GB RAM.
+
+Higher system bus speed → burst settings can be more aggressive without saturating peripherals.
+
+10. Practical Programming Tips (Bare-Metal / Circle)
+Always cache-align buffers for DMA.
+
+Place control blocks in uncached memory or flush cache before start.
+
+Use NEXTCONBK to chain transfers for large or repeated operations.
+
+Use DREQ pacing for streaming peripherals (UART, SPI, I²S, etc.).
+
+In HDMI/framebuffer work → 2D stride mode saves CPU bandwidth.
+
+Always reset DMA channel and clear interrupts before reuse.
+
