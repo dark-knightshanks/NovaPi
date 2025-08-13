@@ -38,20 +38,6 @@ void miniuart_gpio(){
     reg &= ~((0b11 << 28) | (0b11 << 30));
     GPIO_PUP_PDN_CNTRL_REG0 = reg;
 }
-void led_blink(){ // Set GPIO 18 as output (onboard LED on some Pi models)
-    GPFSEL1 &= ~(7 << 24);  // Clear bits 26-24
-    GPFSEL1 |= (1 << 24);   // Set as output
-    
-    // Blink forever
-    while(1) {
-        GPSET0 = (1 << 18);  // LED on
-        for(volatile int i = 0; i < 1000000; i++);
-        
-        GPCLR0 = (1 << 18);  // LED off  
-        for(volatile int i = 0; i < 1000000; i++);
-    }
-    printf("led_blink");
-}
 
 void spi_gpio(){
 
@@ -92,4 +78,12 @@ void oled_gpiocmd(){
 
 void oled_gpiodata(){
     GPSET0 = (1 << 24); 
+}
+
+
+i2c_gpio(){
+
+    unsigned int selector0 = GPFSEL0;
+    selector0 &= ~(7 << );
+
 }

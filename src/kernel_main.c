@@ -10,9 +10,8 @@
 
 void kernel_main(void)
 {
-  test_spi_pattern(); // Use this first to verify SPI timing
-    //display_logo();
-    
+spi_init();
+spi_write(0x12345678);
 
 while (1) {
   uart_send(uart_recv()); // UART echo
