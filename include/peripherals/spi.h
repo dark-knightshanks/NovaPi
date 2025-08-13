@@ -11,13 +11,13 @@
 
 
 
-
-#define CS_REN (0 << 6)
-#define CS_LEN (0 << 5)
-#define CS_CPHA (0 << 4)
-#define CS_CPOL (0 << 3)
-#define CS_1 (0 << 2)
-#define CS_2 (0 << 1)
-#define CS_0 (0 << 0)
+#define CS_TXD		(1 << 18)
+#define CS_RXD		(1 << 17)
+#define CS_TA		(1 << 7)
+#define CS_DONE		(1 << 16)
+#define CS_CLEAR_RX	(1 << 5)
+#define CS_CLEAR_TX	(1 << 4)
+#define CS_CPOL     (1 << 3)
+#define CS_CPHA      (1 << 2)
 
 #endif /*_P_SPI_H*/
