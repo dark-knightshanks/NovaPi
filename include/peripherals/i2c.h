@@ -16,6 +16,4 @@
 #define CLKT       REG32(BSC1_BASE + 0x1C)   // Clock Stretch Timeout
 
 
-
-
 #endif

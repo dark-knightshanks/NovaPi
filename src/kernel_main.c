@@ -10,8 +10,9 @@
 
 void kernel_main(void)
 {
+
 spi_init();
-spi_write(0x12345678);
+spi_write(0x5678);
 
 while (1) {
   uart_send(uart_recv()); // UART echo

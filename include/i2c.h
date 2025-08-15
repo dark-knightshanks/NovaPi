@@ -3,11 +3,7 @@
 #include <stdint.h>
 
 
-
-
-
-
-
+void i2c_gpio(void);
 
 
 #endif 
