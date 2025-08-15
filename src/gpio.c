@@ -81,9 +81,19 @@ void oled_gpiodata(){
 }
 
 
-i2c_gpio(){
+void i2c_gpio(){
 
-    unsigned int selector0 = GPFSEL0;
-    selector0 &= ~(7 << );
-
-}
+        unsigned int selector = GPFSEL0;
+    
+        selector &= ~((7 << 6) | (7 << 9));
+    
+        selector |= (4 << 6) | (4 << 9);
+        GPFSEL0 = selector;
+    
+    
+        unsigned int reg = GPIO_PUP_PDN_CNTRL_REG0;
+        reg &= ~((0b11 << 4) | (0b11 << 6));
+        GPIO_PUP_PDN_CNTRL_REG0 = reg;
+    
+        delay(150); 
+    }
