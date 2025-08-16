@@ -26,8 +26,8 @@ void spi_transfer_stop(void){
 }
 
 /*function to write data of 2 bytes using spi*/
-void spi_write(uint8_t data) {
-    DLEN = 2;
+void spi_write(uint32_t data) {
+    DLEN = 4;
 
     spi_rx_tx_transfer_active();
 
@@ -35,18 +35,9 @@ void spi_write(uint8_t data) {
     while (!(CS & CS_TXD)) {}
     FIFO = data;
     
-    while (!(CS & CS_TXD)) {}
-    FIFO = data;  
+    while(!(CS & CS_DONE)) {}
     printf("fifo done");
  
-    while(!(CS & CS_DONE)) {
-        while(CS & CS_RXD) {
-            volatile uint32_t dummy = FIFO;
-            (void)dummy;
-        }
-    }
-    printf("read fifo done");
-
    spi_transfer_stop();
 
 }
