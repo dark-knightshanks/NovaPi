@@ -93,3 +93,34 @@ void oled_gpiocmd(){
 void oled_gpiodata(){
     GPSET0 = (1 << 24); 
 }
+void i2c_gpio() {
+    
+    unsigned int selector = GPFSEL0;
+   
+    selector &= ~((7 << 6) | (7 << 9));
+
+    selector |= (4 << 6) | (4 << 9);
+    GPFSEL0 = selector;
+
+    
+    unsigned int reg = GPIO_PUP_PDN_CNTRL_REG0;
+    reg &= ~((0b11 << 4) | (0b11 << 6));  
+    GPIO_PUP_PDN_CNTRL_REG0 = reg;
+
+    delay(150); 
+}
+/*New helper function*/
+void gpio_set_alt(int pin, int alt) {
+    /*GPFSEL register controls 10 pins*/
+    int reg = pin / 10;          
+    int shift = (pin % 10) * 3;
+
+    volatile unsigned int* gpfsel = &GPFSEL0 + reg;
+
+    unsigned int val = *gpfsel;
+   /* Clear existing 3 bits*/
+    val &= ~(7 << shift);    
+    /* Set ALT function*/    
+    val |= (alt << shift);       
+    *gpfsel = val;
+}
