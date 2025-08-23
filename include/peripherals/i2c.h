@@ -6,14 +6,16 @@
 #define BSC1_BASE       (PBASE + 0x804000)
 
 // I2C1 / BSC1 Registers
-#define C          REG32(BSC1_BASE + 0x00)   // Control
-#define S          REG32(BSC1_BASE + 0x04)   // Status
-#define DLEN       REG32(BSC1_BASE + 0x08)   // Data Length
-#define A          REG32(BSC1_BASE + 0x0C)   // Slave Address
-#define FIFO       REG32(BSC1_BASE + 0x10)   // FIFO Data
-#define DIV        REG32(BSC1_BASE + 0x14)   // Clock Divider
-#define DEL        REG32(BSC1_BASE + 0x18)   // Data Delay
-#define CLKT       REG32(BSC1_BASE + 0x1C)   // Clock Stretch Timeout
+#define BSC1_C          REG32(BSC1_BASE + 0x00)   // Control
+#define BSC1_S          REG32(BSC1_BASE + 0x04)   // Status
+#define BSC1_DLEN       REG32(BSC1_BASE + 0x08)   // Data Length
+#define BSC1_A          REG32(BSC1_BASE + 0x0C)   // Slave Address
+#define BSC1_FIFO       REG32(BSC1_BASE + 0x10)   // FIFO Data
+#define BSC1_DIV        REG32(BSC1_BASE + 0x14)   // Clock Divider
+#define BSC1_DEL        REG32(BSC1_BASE + 0x18)   // Data Delay
+#define BSC1_CLKT       REG32(BSC1_BASE + 0x1C)   // Clock Stretch Timeout
 
 
-#endif
+
+
+#endif 
