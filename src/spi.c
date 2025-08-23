@@ -1,58 +1,27 @@
 #include "printf.h"
 #include "peripherals/spi.h"
 #include <stdint.h>
+#include "gpio.h"
+#include "utils.h"
 
-/*initializiing clock, CS registers for standard mode*/
+// Initializes the SPI0 peripheral.
 void spi_init(void) {
-    spi_gpio(); 
-    CS &= ~(3<<0);
-    CLK = 250;
+    spi_gpio();
+    CLK = 2048;
+    CS &= ~(CS_CPOL | CS_CPHA);
+    CS &= ~(3 << 0);
 }
 
-/*function to set transfer active and RX/TX */
-void spi_rx_tx_transfer_active(void){
-
+// Writes a single 32-bit value to the SPI bus.
+void spi_write(uint32_t data) {
+    DLEN = 4;
     CS |= CS_CLEAR_RX | CS_CLEAR_TX;
     CS |= CS_TA;
 
-    printf("transfer active");
-}
-/*function to reset transfer to 0*/
-void spi_transfer_stop(void){
-
-    delay(100000);
-    CS &= ~CS_TA;    
-
-}
-
-/*function to write data of 2 bytes using spi*/
-void spi_write(uint32_t data) {
-    DLEN = 4;
-
-    spi_rx_tx_transfer_active();
-
-   
-    while (!(CS & CS_TXD)) {}
+    while (!(CS & CS_TXD));
     FIFO = data;
-    
-    while(!(CS & CS_DONE)) {}
-    printf("fifo done");
- 
-   spi_transfer_stop();
 
-}
+    while (!(CS & CS_DONE));
 
-/*function to  read data froom fifo register*/
-void spi_read(void){
-    DLEN = 2;
-    spi_rx_tx_transfer_active();
-
-    while (!(CS & CS_TXD)) {}
-    FIFO = 0x5678;
-
-    while (!(CS & CS_RXD)) {}
-    uint8_t data = FIFO;
-    
-    spi_transfer_stop();
-    return data;
+    CS &= ~CS_TA;
 }

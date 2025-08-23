@@ -10,15 +10,12 @@
 
 void kernel_main(void)
 {
+  uart_init();
+  init_printf(0, pl011_putc);
+  uart_send_string("HELLO  WORLD");
+  printf("hello world");
 
-spi_init();
-spi_write(0x5678);
-
-while (1) {
-  uart_send(uart_recv()); // UART echo
+  while (1) {
+    uart_send(uart_recv());
+  }
 }
-}
-
-
-//qemu-system-aarch64 -M raspi4b -kernel kernel8.img -nographic -serial mon:stdio -serial null(pl011 command for QEMU)
-//qemu-system-aarch64     -M raspi4b   -kernel kernel8.img  -nographic   -serial null     -serial mon:stdio (mini uart command)
