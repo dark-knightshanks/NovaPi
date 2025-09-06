@@ -1,23 +1,28 @@
 #include "printf.h"
 #include <stdint.h>
+#include "peripherals/i2c.h"
 
+#define OLED_I2C_ADDR 0x3C   // SSD1306 default address
 
-// OLED command and data functions
+// Send one command
 void oled_command(uint8_t cmd) {
-    oled_gpiocmd(); // Command mode (DC low)
-    spi_write(cmd);
+    uint8_t buf[2];  // Changed from uint32_t to uint8_t
+    buf[0] = 0x00;   // Control byte: Co=0, D/C#=0 → command
+    buf[1] = cmd;
+    i2c_write(OLED_I2C_ADDR, buf, 2);  // Added missing I2C write
 }
 
+// Send one data byte
 void oled_data(uint8_t data) {
-    oled_gpiodata(); // Data mode (DC high)
-    spi_write(data);
+    uint8_t buf[2];  // Changed from uint32_t to uint8_t
+    buf[0] = 0x40;   // Control byte: Co=0, D/C#=1 → data
+    buf[1] = data;
+    i2c_write(OLED_I2C_ADDR, buf, 2);  // Added missing I2C write
 }
-
 // OLED initialization
 void oled_init(void) {
     delay(10000);
-    
-    // Basic SSD1306 initialization sequence
+
     oled_command(0xAE); // Display OFF
     oled_command(0xD5); // Set Display Clock Divide Ratio
     oled_command(0x80); // Default ratio
@@ -43,7 +48,7 @@ void oled_init(void) {
     oled_command(0xA4); // Entire Display ON (use RAM content)
     oled_command(0xA6); // Set Normal Display (not inverted)
     oled_command(0xAF); // Display ON
-    
+
     delay(10000);
     printf("OLED initialized\n");
 }
@@ -54,17 +59,16 @@ void oled_clear(void) {
     oled_command(0x21);
     oled_command(0x00);
     oled_command(0x7F);
-    
+
     // Set page address (0 to 7)
     oled_command(0x22);
     oled_command(0x00);
     oled_command(0x07);
-    
+
     // Clear all pixels
     for (int i = 0; i < 1024; i++) { // 128x64 = 8192 bits = 1024 bytes
         oled_data(0x00);
     }
-    
+
     printf("OLED cleared\n");
 }
-

@@ -1,9 +1,9 @@
-#ifndef	_TIMER_H
-#define	_TIMER_H
+#pragma once
 
-extern void timer_init ( void );
-extern void handle_timer_irq ( void );
-extern void delay_timer ( unsigned long );
+#include "common.h"
 
-
-#endif  /*_TIMER_H */
+void timer_init();
+void handle_timer_1();
+void handle_timer_3();
+void timer_sleep(u32 ms);
+u64 timer_get_ticks();
