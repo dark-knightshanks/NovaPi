@@ -15,11 +15,11 @@ The repository deals with creating a bare-metal operating system and hardware ab
 
 HOW TO START ON THIS PROJECT :
 1. Clone the repository in your computer
-2. Use command
+2.Use comamnd 
 ```bash
-     make clean && make
-     ```
+make clean && make
+```
 3. REQUIREMENTS : A MICRO SD CARD , and using RPI IMAGER flah the raspberry pi 64 os on it.
-4. AFTER MAKE A 'kernel8.img' will be generated copy this and the 'config.txt' files in sd card and you are ready to start on this project.
+4. After make a 'kernel8.img' will be generated copy this and the 'config.txt' files in sd card and you are ready to start on this project.
 
 HAPPY CODING !!!!!
