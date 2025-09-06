@@ -69,16 +69,18 @@ void oled_gpiodata(){
 
 
 void i2c_gpio() {
-    // Instead of ALT0, set GPIO2 as output for LED test
-    GPFSEL0 &= ~(7 << 6);   // clear FSEL2 (bits 8:6)
-    GPFSEL0 |=  (1 << 6);   // set FSEL2 = 001 (output)
+    
+    unsigned int selector = GPFSEL0;
+   
+    selector &= ~((7 << 6) | (7 << 9));
 
-    // Blink LED on GPIO2
-    while (1) {
-        GPSET0 = (1 << 2);   // GPIO2 high
-        delay(500000);
+    selector |= (4 << 6) | (4 << 9);
+    GPFSEL0 = selector;
 
-        GPCLR0 = (1 << 2);   // GPIO2 low
-        delay(500000);
-    }
+    
+    unsigned int reg = GPIO_PUP_PDN_CNTRL_REG0;
+    reg &= ~((0b11 << 4) | (0b11 << 6));  
+    GPIO_PUP_PDN_CNTRL_REG0 = reg;
+
+    delay(150); 
 }
