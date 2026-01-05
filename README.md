@@ -23,3 +23,4 @@ make clean && make
 4. After make a 'kernel8.img' will be generated copy this and the 'config.txt' files in sd card and you are ready to start on this project.
 
 HAPPY CODING !!!!!
+
