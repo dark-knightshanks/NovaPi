@@ -17,6 +17,7 @@ void kernel_main(void)
     int el = get_el();
     printf("Exception level: %d\r\n", el);  
     i2c_init();
+    mail_framebuffer();
 
     // Example: write data to a slave device (say address 0x50)
     //uint32_t slave_addr = 0x50; 
