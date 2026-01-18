@@ -19,6 +19,9 @@ void kernel_main(void)
     i2c_init();
     mail_framebuffer();
 
+    char str[100];
+    sprintf(str,"NovaPi says Hello");
+    video_draw_string(str,332,292);
     // Example: write data to a slave device (say address 0x50)
     //uint32_t slave_addr = 0x50; 
     //uint32_t data_to_send[2] = {0xAB, 0xCD}; 

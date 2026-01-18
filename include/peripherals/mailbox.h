@@ -30,16 +30,16 @@
 #define MAIL_TAGS     0x8 // Mailbox Channel 8: Tags (ARM to VC)
 
 struct framebuffer{
-    uint32_t width;          // physical framebuffer
-    uint32_t height;          // physical framebuffer
+    uint32_t width;                 // physical framebuffer
+    uint32_t height;                // physical framebuffer
     uint32_t virtual_width;         // virtual framebuffer width   
-    uint32_t virtual_height;         // virtual framebuffer heigth 
-    uint32_t pitch;      // pitch = width*bytes
-    uint32_t depth;      // bits per pixel
-    uint32_t x_offset;         // offset width
-    uint32_t y_offset;         // offset heigth
-    uint32_t frame_addr; // address form gpu 
-    uint32_t frame_size; // size of the framebuffer = width*heigth*bytes
+    uint32_t virtual_height;        // virtual framebuffer heigth 
+    uint32_t pitch;                 // pitch = width*bytes
+    uint32_t depth;                 // bits per pixel
+    uint32_t x_offset;              // offset width
+    uint32_t y_offset;              // offset heigth
+    uint32_t frame_addr;            // address form gpu 
+    uint32_t frame_size;            // size of the framebuffer = width*heigth*bytes
     };
 
  __attribute__((section(".mailbox_fb"), aligned(16)))
