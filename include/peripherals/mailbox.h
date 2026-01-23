@@ -17,6 +17,21 @@
 #define CONFIG    REG32(Mail_BASE + 0x1c)
 #define POLL      REG32(Mail_BASE + 0x10)
 
+//  propety tags
+#define RPI_FIRMWARE_STATUS_SUCCESS         0x80000000   
+#define RPI_FIRMWARE_STATUS_REQUEST         0
+#define MAILBOX_TAG_SET_POWER               0x28001
+#define MAILBOX_TAG_SET_CLK_RATE            0x38002
+#define MAILBOX_TAG_SET_PHYS_WH             0x48003 
+#define MAILBOX_TAG_SET_VIRT_WH             0x48004 
+#define MAILBOX_TAG_SET_VIRT_OFFSET         0x48009 
+#define MAILBOX_TAG_SET_DEPTH               0x48005 
+#define MAILBOX_TAG_SET_PIXEL_ORDER         0x48006 
+#define MAILBOX_TAG_ALLOCATE_BUFFER         0x40001
+#define MAILBOX_TAG_GET_PITCH               0x40008         
+#define MAILBOX_TAG_LAST                    0
+
+
 //channels
 
 #define MAIL_POWER    0x0 // Mailbox Channel 0: Power Management Interface
@@ -29,21 +44,56 @@
 #define MAIL_COUNT    0x7 // Mailbox Channel 7: Counter
 #define MAIL_TAGS     0x8 // Mailbox Channel 8: Tags (ARM to VC)
 
-struct framebuffer{
-    uint32_t width;                 // physical framebuffer
-    uint32_t height;                // physical framebuffer
-    uint32_t virtual_width;         // virtual framebuffer width   
-    uint32_t virtual_height;        // virtual framebuffer heigth 
-    uint32_t pitch;                 // pitch = width*bytes
-    uint32_t depth;                 // bits per pixel
-    uint32_t x_offset;              // offset width
-    uint32_t y_offset;              // offset heigth
-    uint32_t frame_addr;            // address form gpu 
-    uint32_t frame_size;            // size of the framebuffer = width*heigth*bytes
-    };
+typedef struct
+{
+    uint32_t id;
+    uint32_t buffer_size;
+    uint32_t value_length;
+}mailbox_tag;
 
- __attribute__((section(".mailbox_fb"), aligned(16)))
-volatile struct framebuffer fb1;
+typedef struct {
+    uint32_t size;
+    uint32_t code;
+    uint8_t tags[0];
+} property_buffer;
+
+typedef struct {
+    mailbox_tag tag;
+    uint32_t width;
+    uint32_t height;
+} mailbox_fb_size;
+
+typedef struct {
+    mailbox_tag tag;
+    uint32_t bpp;
+} mailbox_fb_depth;
+
+typedef struct {
+    mailbox_tag tag;
+    uint32_t pitch;
+} mailbox_fb_pitch;
+
+typedef struct {
+    mailbox_tag tag;
+    uint32_t base; // framebuffer address
+    uint32_t screen_size;
+} mailbox_fb_buffer;
+
+typedef struct {
+    mailbox_fb_size res;
+    mailbox_fb_size vres; //virtual resolution..
+    mailbox_fb_depth depth;
+    mailbox_fb_buffer buff;
+    mailbox_fb_pitch pitch;
+    uint32_t end_tag;
+} mailbox_fb_request;
+
+
+   
+//extern volatile struct mailbox_fb_request fb1;
+
+
+
     
             
 

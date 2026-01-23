@@ -6,21 +6,24 @@
 #include "spi.h"
 #include "pl011.h"
 #include "oled.h"
+#include "peripherals/mailbox.h"
 #include "mailbox.h"
+#include "video.h"
 
 
 void kernel_main(void)
 { 
-    muart_init();
-    init_printf(0,putc);  
-    muart_send_string("Hello, world!\r\n");
+    uart_init();
+    init_printf(0,pl011_putc);  
+    uart_send_string("Hello, world!\r\n");
     int el = get_el();
     printf("Exception level: %d\r\n", el);  
-    i2c_init();
-    mail_framebuffer();
+    //i2c_init();
 
-    char str[100];
+    char str[17];
     sprintf(str,"NovaPi says Hello");
+    printf("%s\n",str);
+    mail_framebuffer(800,600,32);
     video_draw_string(str,332,292);
     // Example: write data to a slave device (say address 0x50)
     //uint32_t slave_addr = 0x50; 

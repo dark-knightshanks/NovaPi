@@ -9,6 +9,8 @@
 
 #include "stdint.h"
 #include <stdbool.h>
+#include "peripherals/mailbox.h"
+
 
 static const unsigned width       = 8;
 static const unsigned height      = 16;

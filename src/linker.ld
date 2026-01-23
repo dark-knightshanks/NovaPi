@@ -33,10 +33,5 @@ SECTIONS
     bss_end = .;       /* <-- needed by boot.S */
     __bss_end = .;
     }
-    /*Aligning the framebuffer 16 bits in RAM so that can be shared by ARM & GPU */
-    .mailbox_fb : ALIGN(16)
-    {
-         *(.mailbox_fb)   /* All C objects put in this section */
-    }> RAM
 }
 
