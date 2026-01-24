@@ -19,3 +19,16 @@ void handle_timer_irq( void )
 	TIMER_CS = TIMER_CS_M1;
 	printf("Timer interrupt received\n\r");
 }
+
+uint32_t timer_get_ticks() {
+    uint32_t hi = TIMER_CHI;
+    uint32_t lo = TIMER_CLO;
+
+    //double check hi value didn't change after setting it...
+    if (hi != TIMER_CHI) {
+        hi = TIMER_CHI;
+        lo = TIMER_CLO;
+    }
+
+    return (((uint64_t)hi << 32) | lo)/1000;
+}
